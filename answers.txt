@@ -1,0 +1,45 @@
+Question: 1.  What year did leaders from 193 countries come together to address global challenges, and what was the name of the plan they created?
+Answer: Leaders from 193 countries came together in the year **2015** to face the future. The plan they created was called the **Sustainable Development Goals (SDGs)**.
+--------------------------------------------------
+
+Question: 2.  What is the overarching timeframe for achieving the Sustainable Development Goals (SDGs)?
+Answer: The overarching timeframe for achieving the Sustainable Development Goals (SDGs) is by the year **2030**.
+--------------------------------------------------
+
+Question: 3.  Which organization is highlighted as a leading entity working to fulfill the SDGs, and in how many countries and territories is it present?
+Answer: The organization highlighted as a leading entity working to fulfill the SDGs is the **United Nations Development Programme (UNDP)**. It is present in nearly **170 countries and territories**.
+--------------------------------------------------
+
+Question: 4.  What was the primary commitment made in the year 2000 regarding extreme poverty, and was it met by its target year?
+Answer: In the year 2000, the world committed to halving the number of people living in extreme poverty by the year 2015. This goal was met.
+--------------------------------------------------
+
+Question: 5.  What is the current approximate number of people living in extreme poverty globally, and what is the equivalent population comparison used in the text?
+Answer: The text states that more than 800 million people around the world still live on less than $1.25 a day. This is compared to the equivalent of the entire population of Europe living in extreme poverty.
+--------------------------------------------------
+
+Question: 6.  What significant progress has been made in reducing hunger over the past 20 years?
+Answer: In the past 20 years, hunger has dropped by almost half. Many countries that used to suffer from famine and hunger can now meet the nutritional needs of their most vulnerable people.
+--------------------------------------------------
+
+Question: 7.  What are some of the key challenges that prevent children from attending school, and what is the disparity in school enrollment between the poorest and richest households?
+Answer: The key challenges that prevent children from attending school are poverty, armed conflict, and other emergencies.
+
+The disparity in school enrollment is significant: children from the poorest households are four times more likely to be out of school than those from the richest households.
+--------------------------------------------------
+
+Question: 8.  What is the current enrollment rate for primary education in developing regions, and what is the stated goal for education moving forward?
+Answer: The current enrollment rate for primary education in developing regions has reached 91%. The stated goal moving forward is to achieve universal primary and secondary education, affordable vocational training, and access to higher education.
+--------------------------------------------------
+
+Question: 9.  What are some of the persistent inequalities faced by women and girls, despite progress in areas like education and employment?
+Answer: Despite progress in areas like education and employment, women and girls still face persistent inequalities in the following areas:
+
+*   **Work and wages:** There are still gross inequalities in work and wages.
+*   **Unpaid work:** A significant amount of unpaid "women's work" such as childcare and domestic work continues to be disproportionately carried out by women.
+*   **Discrimination in decision-making:** Women face discrimination in public decision-making processes.
+--------------------------------------------------
+
+Question: 10. What percentage of people worldwide is affected by water scarcity, and what is the projected increase by 2050?
+Answer: Water scarcity affects more than 40 percent of people around the world, and that number is projected to go even higher by 2050.
+--------------------------------------------------
