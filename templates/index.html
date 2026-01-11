@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Q&A Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a; /* slate-900 */
+      --panel: #111827; /* gray-900 */
+      --muted: #64748b; /* slate-500 */
+      --text: #e5e7eb; /* gray-200 */
+      --accent: #22c55e; /* green-500 */
+      --accent-600: #16a34a; /* green-600 */
+      --border: #1f2937; /* gray-800 */
+      --danger: #ef4444; /* red-500 */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(180deg, #0b1021 0%, #0f172a 100%);
+      color: var(--text);
+    }
+    header { padding: 24px; border-bottom: 1px solid var(--border); background: rgba(17,24,39,0.6); backdrop-filter: blur(4px); position: sticky; top: 0; }
+    header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+    header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .container { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    .card { background: rgba(17,24,39,0.8); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .card h2 { margin: 0 0 8px; font-size: 16px; }
+    .row { display: flex; flex-wrap: wrap; gap: 16px; }
+    .col { flex: 1 1 320px; }
+
+    label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--muted); }
+    input[type="text"], input[type="file"] {
+      width: 100%; background: #0b1021; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+    }
+    input[type="file"] { padding: 8px; }
+
+    button { appearance: none; border: none; background: var(--accent); color: #06210f; font-weight: 700; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+    button:hover { background: var(--accent-600); }
+    button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+    .status { font-size: 13px; color: var(--muted); }
+    .error { color: var(--danger); }
+    .success { color: var(--accent); }
+
+    .output { margin-top: 8px; background: #0b1021; border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+    a.link { color: #93c5fd; text-decoration: none; }
+    a.link:hover { text-decoration: underline; }
+
+    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px; }
+    code.k { background: #0b1021; border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Interview Q&A Generator</h1>
+    <p>Upload a PDF, then analyze to generate Questions & Answers.</p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>1) Upload PDF</h2>
+      <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload">
+        <div class="row">
+          <div class="col">
+            <label for="pdf_file">PDF File</label>
+            <input id="pdf_file" name="pdf_file" type="file" accept="application/pdf" required />
+          </div>
+          <div class="col">
+            <label for="filename">Filename (auto-filled)</label>
+            <input id="filename" name="filename" type="text" placeholder="mydoc.pdf" required />
+          </div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+          <button type="submit">Upload</button>
+          <span id="uploadStatus" class="status"></span>
+        </div>
+      </form>
+      <div id="uploadResult" class="output" style="display:none;"></div>
+    </section>
+
+    <section class="card">
+      <h2>2) Analyze & Generate CSV</h2>
+      <div class="row">
+        <div class="col">
+          <label for="pdfPath">Uploaded PDF Path</label>
+          <input id="pdfPath" type="text" placeholder="static/docs/yourfile.pdf" readonly />
+        </div>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+        <button id="analyzeBtn" type="button">Analyze</button>
+        <span id="analyzeStatus" class="status"></span>
+      </div>
+      <div id="analyzeResult" class="output" style="display:none;"></div>
+    </section>
+
+    <section class="card">
+      <h2>3) Output</h2>
+      <div id="downloadBlock" style="display:none;">
+        <p class="success">CSV generated successfully.</p>
+        <p>Download: <a id="csvLink" class="link" href="#" download>QA.csv</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>FastAPI app · Uploads stored under <code class="k">static/docs</code> · Outputs in <code class="k">static/output</code></p>
+  </footer>
+
+  <script>
+    // Auto-fill filename from selected file
+    const fileInput = document.getElementById('pdf_file');
+    const filenameInput = document.getElementById('filename');
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files?.[0];
+      if (f && f.name) filenameInput.value = f.name;
+    });
+
+    function safeParse(text) {
+      // Handles responses that might be a JSON string of a JSON string
+      try {
+        const first = JSON.parse(text);
+        if (typeof first === 'string') {
+          return JSON.parse(first);
+        }
+        return first;
+      } catch (e) {
+        console.warn('Failed to parse JSON, returning raw text.', e);
+        return { msg: 'raw', raw: text };
+      }
+    }
+
+    // Upload handler
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadResult = document.getElementById('uploadResult');
+    const pdfPathInput = document.getElementById('pdfPath');
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      uploadStatus.textContent = 'Uploading…';
+      uploadResult.style.display = 'none';
+
+      const formData = new FormData(uploadForm);
+      try {
+        const res = await fetch('/upload', { method: 'POST', body: formData });
+        const text = await res.text();
+        const data = safeParse(text);
+        if (!res.ok) throw new Error('Upload failed');
+
+        uploadStatus.textContent = 'Uploaded.';
+        const pdfPath = data?.pdf_filename || data?.msg || '';
+        pdfPathInput.value = data?.pdf_filename || '';
+        uploadResult.style.display = 'block';
+        uploadResult.textContent = `Saved to: ${pdfPath || 'unknown path'}`;
+      } catch (err) {
+        console.error(err);
+        uploadStatus.textContent = '';
+        uploadResult.style.display = 'block';
+        uploadResult.innerHTML = `<span class="error">Upload error: ${err.message}</span>`;
+      }
+    });
+
+    // Analyze handler
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const analyzeStatus = document.getElementById('analyzeStatus');
+    const analyzeResult = document.getElementById('analyzeResult');
+    const downloadBlock = document.getElementById('downloadBlock');
+    const csvLink = document.getElementById('csvLink');
+
+    analyzeBtn.addEventListener('click', async () => {
+      const pdfFilename = pdfPathInput.value.trim();
+      if (!pdfFilename) {
+        analyzeResult.style.display = 'block';
+        analyzeResult.innerHTML = '<span class="error">Please upload a PDF first.</span>';
+        return;
+      }
+      analyzeStatus.textContent = 'Analyzing… this may take a minute';
+      analyzeResult.style.display = 'none';
+      downloadBlock.style.display = 'none';
+
+      try {
+        const formData = new FormData();
+        formData.append('pdf_filename', pdfFilename);
+        const res = await fetch('/analyze', { method: 'POST', body: formData });
+        const text = await res.text();
+        const data = safeParse(text);
+        if (!res.ok) throw new Error('Analyze failed');
+
+        analyzeStatus.textContent = 'Complete.';
+        analyzeResult.style.display = 'block';
+        const outputFile = data?.output_file || '';
+        analyzeResult.textContent = outputFile ? `Output: ${outputFile}` : 'No output file returned.';
+        if (outputFile) {
+          csvLink.href = `/${outputFile}`.replace(/^\/+/, '/');
+          csvLink.textContent = outputFile.split('/').pop() || 'QA.csv';
+          downloadBlock.style.display = 'block';
+        }
+      } catch (err) {
+        console.error(err);
+        analyzeStatus.textContent = '';
+        analyzeResult.style.display = 'block';
+        analyzeResult.innerHTML = `<span class="error">Analyze error: ${err.message}</span>`;
+      }
+    });
+  </script>
+</body>
+</html>
