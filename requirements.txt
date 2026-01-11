@@ -1,0 +1,13 @@
+langchain
+langchain-community
+langchain-core
+langchain-google-genai
+python-multipart
+python-dotenv
+fastapi
+uvicorn
+tiktoken
+aiofiles
+jinja2
+faiss-cpu
+pypdf
